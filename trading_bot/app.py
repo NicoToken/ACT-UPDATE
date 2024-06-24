@@ -59,6 +59,28 @@ async def stop_bot():
         await discord_bot.stop_discord_bot()  # Stop Discord bot
     return RedirectResponse(url="/", status_code=303)
 
+@app.post("/connect-discord")
+async def connect_discord():
+    if not discord_bot.client.is_ready():
+        await discord_bot.start_discord_bot()
+    return RedirectResponse(url="/", status_code=303)
+
+@app.post("/disconnect-discord")
+async def disconnect_discord():
+    if discord_bot.client.is_ready():
+        await discord_bot.stop_discord_bot()
+    return RedirectResponse(url="/", status_code=303)
+
+@app.post("/connect-bitget")
+async def connect_bitget():
+    # Logic to connect Bitget API if needed
+    return RedirectResponse(url="/", status_code=303)
+
+@app.post("/disconnect-bitget")
+async def disconnect_bitget():
+    # Logic to disconnect Bitget API if needed
+    return RedirectResponse(url="/", status_code=303)
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
