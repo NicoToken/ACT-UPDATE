@@ -1,8 +1,15 @@
 {
+  "version": 2,
   "builds": [
-    { "src": "app.py", "use": "@vercel/python" }
+    {
+      "src": "trading_bot/app.py",
+      "use": "@vercel/python"
+    }
   ],
-  "routes": [
-    { "src": "/(.*)", "dest": "app.py" }
-  ]
+  "env": {
+    "DISCORD_TOKEN": "@discord_token",
+    "BITGET_API_KEY": "@bitget_api_key",
+    "BITGET_API_SECRET": "@bitget_api_secret",
+    "DISCORD_CHANNEL_ID": "@discord_channel_id"
+  }
 }
