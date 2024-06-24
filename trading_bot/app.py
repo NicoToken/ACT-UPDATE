@@ -1,4 +1,4 @@
-# trading_bot/app.py
+# app.py
 
 import os
 import asyncio
@@ -7,35 +7,27 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
-import discord_bot
+import trading_bot.discord_bot as discord_bot  # Import your modified discord_bot module
 
 load_dotenv()
-
-DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
-BITGET_API_KEY = os.getenv('BITGET_API_KEY')
-BITGET_API_SECRET = os.getenv('BITGET_API_SECRET')
-CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Store bot status
 bot_status = {"running": False}
 
-async def send_discord_message(message: str):
-    try:
-        await discord_bot.send_message_to_discord(message)
-        return {"status": "Message sent to Discord"}
-    except Exception as e:
-        return {"status": f"Failed to send message: {str(e)}"}
+@app.on_event("startup")
+async def startup_event():
+    # Start Discord bot when FastAPI starts
+    if not discord_bot.client.is_ready():
+        await discord_bot.run_bot()
 
-# Your FastAPI route definitions here
 @app.get("/")
 async def read_root(request: Request):
-    discord_connected = discord_bot.client.is_ready() if discord_bot.client.is_ready() else False
-    bitget_connected = True  # Assuming Bitget is always connected in this context
-    bitget_balance = 0
+    discord_connected = discord_bot.client.is_ready()
+    bitget_connected = True  # You can update this based on actual connection status
+    bitget_balance = 0  # Update this based on actual balance retrieval logic
 
     return templates.TemplateResponse("index.html", {
         "request": request,
@@ -49,7 +41,7 @@ async def read_root(request: Request):
 async def start_bot():
     if not bot_status["running"]:
         bot_status["running"] = True
-        asyncio.create_task(discord_bot.start_discord_bot())  # Start Discord bot in background task
+        asyncio.create_task(discord_bot.run_bot())  # Start Discord bot in background task
     return RedirectResponse(url="/", status_code=303)
 
 @app.post("/stop-bot")
@@ -62,7 +54,7 @@ async def stop_bot():
 @app.post("/connect-discord")
 async def connect_discord():
     if not discord_bot.client.is_ready():
-        await discord_bot.start_discord_bot()
+        await discord_bot.run_bot()
     return RedirectResponse(url="/", status_code=303)
 
 @app.post("/disconnect-discord")
@@ -73,12 +65,10 @@ async def disconnect_discord():
 
 @app.post("/connect-bitget")
 async def connect_bitget():
-    # Logic to connect Bitget API if needed
     return RedirectResponse(url="/", status_code=303)
 
 @app.post("/disconnect-bitget")
 async def disconnect_bitget():
-    # Logic to disconnect Bitget API if needed
     return RedirectResponse(url="/", status_code=303)
 
 if __name__ == "__main__":
