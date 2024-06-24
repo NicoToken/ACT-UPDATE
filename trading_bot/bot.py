@@ -14,7 +14,17 @@ DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 BITGET_API_KEY = os.getenv('BITGET_API_KEY')
 BITGET_API_SECRET = os.getenv('BITGET_API_SECRET')
 
-client = discord.Client(intents=discord.Intents.default())
+if not DISCORD_TOKEN:
+    raise ValueError("DISCORD_TOKEN is not set in environment variables.")
+if not BITGET_API_KEY:
+    raise ValueError("BITGET_API_KEY is not set in environment variables.")
+if not BITGET_API_SECRET:
+    raise ValueError("BITGET_API_SECRET is not set in environment variables.")
+
+DISCORD_TOKEN = DISCORD_TOKEN.strip()  # Remove any leading/trailing whitespace
+
+intents = discord.Intents.default()
+client = discord.Client(intents=intents)
 
 def sign_request(params, secret):
     params_str = '&'.join([f"{k}={v}" for k, v in sorted(params.items())])
@@ -79,7 +89,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.channel.id != 1245551721262878730:
+    if message.channel.id != int(os.getenv('DISCORD_CHANNEL_ID')):  # Ensure correct channel ID
         return
 
     if '$' not in message.content:
@@ -113,4 +123,11 @@ async def on_message(message):
         print(f"An error occurred while processing the message: {e}")
 
 def run_discord_bot():
-    client.run(DISCORD_TOKEN)
+    try:
+        client.run(DISCORD_TOKEN)
+    except discord.LoginFailure as e:
+        print(f"Failed to log in to Discord: {e}")
+        raise  # Reraise to propagate the exception
+
+if __name__ == "__main__":
+    run_discord_bot()
