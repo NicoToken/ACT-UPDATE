@@ -1,1 +1,39 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Bot Status</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Trading Bot Status</h1>
+    <div class="status">
+        <div class="status-item">
+            {% if discord_connected %}
+                <span class="connected">● Discord</span>
+            {% else %}
+                <span class="disconnected">○ Discord</span>
+            {% endif %}
+        </div>
+        <div class="status-item">
+            {% if bitget_connected %}
+                <span class="connected">● Bitget</span>
+            {% else %}
+                <span class="disconnected">○ Bitget</span>
+            {% endif %}
+        </div>
+        <div class="status-item">
+            <span>Saldo Bitget: {{ bitget_balance }} USDT</span>
+        </div>
+    </div>
+    <div class="controls">
+        <form action="/start-bot" method="post">
+            <button type="submit" {% if bot_status %}disabled{% endif %}>Start Bot</button>
+        </form>
+        <form action="/stop-bot" method="post">
+            <button type="submit" {% if not bot_status %}disabled{% endif %}>Stop Bot</button>
+        </form>
+    </div>
+</body>
+</html>
