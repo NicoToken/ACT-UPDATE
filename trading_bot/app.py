@@ -1,3 +1,5 @@
+# app.py
+
 import os
 import asyncio
 from fastapi import FastAPI, Request
@@ -5,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
-import trading_bot.discord_bot as discord_bot
+import trading_bot.discord_bot as discord_bot  # Import your modified discord_bot module
 
 load_dotenv()
 
@@ -15,18 +17,17 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 bot_status = {"running": False}
 
-async def send_discord_message(message: str):
-    try:
-        await discord_bot.send_message_to_discord(message)
-        return {"status": "Message sent to Discord"}
-    except Exception as e:
-        return {"status": f"Failed to send message: {str(e)}"}
+@app.on_event("startup")
+async def startup_event():
+    # Start Discord bot when FastAPI starts
+    if not discord_bot.client.is_ready():
+        await discord_bot.run_bot()
 
 @app.get("/")
 async def read_root(request: Request):
-    discord_connected = discord_bot.client.is_ready() if discord_bot.client.is_ready() else False
-    bitget_connected = True
-    bitget_balance = 0
+    discord_connected = discord_bot.client.is_ready()
+    bitget_connected = True  # You can update this based on actual connection status
+    bitget_balance = 0  # Update this based on actual balance retrieval logic
 
     return templates.TemplateResponse("index.html", {
         "request": request,
