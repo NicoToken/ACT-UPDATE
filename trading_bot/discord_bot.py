@@ -24,13 +24,11 @@ async def send_message_to_discord(message):
         print("Channel not found")
 
 async def start_discord_bot():
-    await client.start(DISCORD_TOKEN)
+    try:
+        await client.start(DISCORD_TOKEN)
+    except discord.LoginFailure as e:
+        print(f"Failed to log in to Discord: {e}")
+        raise  # Reraise the exception to propagate it up
 
 async def stop_discord_bot():
     await client.close()
-
-# Start the bot when the script is run directly
-if __name__ == "__main__":
-    import asyncio
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(start_discord_bot())
