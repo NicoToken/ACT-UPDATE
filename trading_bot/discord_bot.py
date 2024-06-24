@@ -1,3 +1,5 @@
+# trading_bot/discord_bot.py
+
 import os
 import discord
 from dotenv import load_dotenv
@@ -5,7 +7,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
-CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
+CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
+
+if not DISCORD_TOKEN:
+    raise ValueError("DISCORD_TOKEN is not set in environment variables.")
+if not CHANNEL_ID:
+    raise ValueError("DISCORD_CHANNEL_ID is not set in environment variables.")
+
+CHANNEL_ID = int(CHANNEL_ID)
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
@@ -23,10 +32,11 @@ async def send_message_to_discord(message):
 
 async def start_discord_bot():
     try:
-        await client.start(DISCORD_TOKEN)
+        print(f"Using DISCORD_TOKEN: '{DISCORD_TOKEN.strip()}'")  # Debug print, remove in production
+        await client.start(DISCORD_TOKEN.strip())
     except discord.LoginFailure as e:
         print(f"Failed to log in to Discord: {e}")
-        raise
+        raise  # Reraise the exception to propagate it up
 
 async def stop_discord_bot():
     await client.close()
