@@ -1,3 +1,5 @@
+# trading_bot/app.py
+
 import os
 import asyncio
 from fastapi import FastAPI, Request
