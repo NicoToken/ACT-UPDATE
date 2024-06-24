@@ -1,3 +1,5 @@
+<!-- trading_bot/templates/index.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,15 +14,27 @@
         <div class="status-item">
             {% if discord_connected %}
                 <span class="connected">● Discord</span>
+                <form action="/disconnect-discord" method="post">
+                    <button type="submit">Disconnect</button>
+                </form>
             {% else %}
                 <span class="disconnected">○ Discord</span>
+                <form action="/connect-discord" method="post">
+                    <button type="submit">Connect</button>
+                </form>
             {% endif %}
         </div>
         <div class="status-item">
             {% if bitget_connected %}
                 <span class="connected">● Bitget</span>
+                <form action="/disconnect-bitget" method="post">
+                    <button type="submit">Disconnect</button>
+                </form>
             {% else %}
                 <span class="disconnected">○ Bitget</span>
+                <form action="/connect-bitget" method="post">
+                    <button type="submit">Connect</button>
+                </form>
             {% endif %}
         </div>
         <div class="status-item">
